@@ -1,11 +1,11 @@
 const { Router } = require("express");
-
+const { knex } = require("./knex");
 const usersRouter = Router();
 
 const weakMapUsers = new WeakMap();
 async function getUser(req) {
   if (!weakMapUsers.has(req)) {
-    const user = { id: 1, name: "Jimmy" };
+    const user = await knex("users").first();
     weakMapUsers.set(req, user);
     return user;
   }

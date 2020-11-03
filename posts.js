@@ -1,26 +1,20 @@
+//@ts-check
 const express = require("express");
 const { getUser } = require("./users");
-
-const posts = [];
-function Post({ body, userId }) {
-  return {
-    id: posts.length,
-    body,
-    userId,
-  };
-}
+const { knex } = require("./knex");
 
 const postsRouter = express.Router();
 
 postsRouter.get("/", async (req, res) => {
   const user = await getUser(req);
+  const posts = await knex("posts").orderBy("id");
   res.json(posts);
 });
 
 postsRouter.get("/:id", async (req, res) => {
   const user = await getUser(req);
   const id = Number(req.params.id);
-  const post = posts.find((post) => post.id === id);
+  const post = await knex("posts").where({ id }).first();
   if (post) {
     res.json(post);
   } else {
@@ -29,10 +23,45 @@ postsRouter.get("/:id", async (req, res) => {
 });
 
 postsRouter.post("/", async (req, res) => {
+  const { body } = req.body;
+
   const user = await getUser(req);
-  const newPost = Post({ body: req.body.body, userId: user.id });
-  posts.push(newPost);
-  res.json(newPost);
+  const [post] = await knex("posts")
+    .insert({ body, userId: user.id })
+    .returning("*");
+
+  res.json(post);
+});
+
+postsRouter.put("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.body;
+
+  const user = await getUser(req);
+  const post = await knex("posts").where({ id });
+
+  if (!post) return res.sendStatus(404);
+
+  const [updatedPost] = await knex("posts")
+    .where({ id })
+    .update({ body })
+    .returning("*");
+
+  res.json(updatedPost);
+});
+
+postsRouter.delete("/:id", async (req, res) => {
+  const { id } = req.params;
+  const { body } = req.body;
+
+  const user = await getUser(req);
+  const post = await knex("posts").where({ id });
+
+  if (!post) return res.sendStatus(404);
+
+  await knex("posts").where({ id }).delete();
+
+  res.sendStatus(202);
 });
 
 module.exports = { postsRouter };
