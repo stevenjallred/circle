@@ -7,8 +7,13 @@ const postsRouter = express.Router();
 
 postsRouter.get("/", async (req, res) => {
   const user = await getUser(req);
-  const posts = await knex("posts").orderBy("id");
-  res.json(posts);
+  const offset = Number(req.query.offset) || 0;
+  const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10));
+  const [{ count: total }] = await knex("posts").count();
+  const meta = { offset, limit, total };
+
+  const posts = await knex("posts").orderBy("id").offset(offset).limit(limit);
+  res.json({ meta, data: posts });
 });
 
 postsRouter.get("/:id", async (req, res) => {
