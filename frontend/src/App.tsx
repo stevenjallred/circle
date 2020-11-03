@@ -40,8 +40,23 @@ function Posts() {
   return (
     <>
       {posts.map((post) => (
-        <div key={post.id}>{post.body}</div>
+        <Post post={post} key={post.id} />
       ))}
+    </>
+  );
+}
+
+function Post({ post }: { post: Post }) {
+  return (
+    <>
+      <StyledPost>
+        User Id: {post.userId}
+        <br />
+        Body: {post.body}
+        <br />
+        Post Id: {post.id}
+        <br />
+      </StyledPost>
     </>
   );
 }
@@ -53,4 +68,12 @@ function DefaultUser() {
 const HelloDiv = styled.div`
   font-size: 32px;
   font-family: "Lemon Milk";
+`;
+
+const StyledPost = styled.ul`
+  font-size: 2rem;
+  border: 1px solid #ccc;
+  padding: 2rem;
+  margin: 4em;
+  font-family: "Philosopher";
 `;
