@@ -12,6 +12,7 @@ export async function getUser(req: Request) {
   }
   return weakMapUsers.get(req);
 }
+
 usersRouter.get("/me", async (req: Request, res: Response) => {
   const user = await getUser(req);
   res.json(user);

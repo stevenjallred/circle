@@ -1,6 +1,6 @@
-import React, { Suspense } from "react";
+import React, { Suspense, useState, useEffect } from "react";
 import styled from "styled-components/macro";
-import useApi, { useSuspending } from "./hooks/use-api";
+import { useApi, axios, touch } from "./hooks/use-api";
 
 type User = {
   id: number;
@@ -13,67 +13,62 @@ type Post = {
   body: string;
 };
 
+type Collection<T> = {
+  meta: any;
+  data: T[];
+};
+
 export default function App() {
+  const [text, setText] = useState("");
+  const [isLoading, setIsLoading] = useState(false);
+  const api = useApi();
+
+  const { data: posts } = api.posts({ limit: 100 }) as Collection<Post>;
+
+  useEffect(() => {
+    const id = window.setInterval(() => {
+      touch("/posts");
+    }, 1000);
+    return () => {
+      clearInterval(id);
+    };
+  }, []);
+
+  async function submit(e: React.FormEvent<HTMLFormElement>) {
+    e.preventDefault();
+    setIsLoading(true);
+    try {
+      await axios.post("/posts", { body: text });
+    } catch (e) {
+    } finally {
+      setIsLoading(false);
+      setText("");
+      await touch("/posts");
+    }
+  }
+
   return (
     <>
-      <HelloDiv>
-        Hello,&nbsp;
-        <Suspense fallback={<DefaultUser />}>
-          <UserName />
-        </Suspense>
-        !
-      </HelloDiv>
-      <Suspense fallback={"loading posts..."}>
-        <Posts />
-      </Suspense>
+      <form onSubmit={submit}>
+        <label>
+          Body:
+          <input
+            value={text}
+            onChange={(e) => {
+              setText(e.target.value);
+            }}
+          />
+        </label>
+        <button>Send</button>
+        {isLoading && <>Loading</>}
+      </form>
+      <ul>
+        {posts.map((post) => (
+          <li key={post.id}>
+            {post.body} by user: {post.userId}
+          </li>
+        ))}
+      </ul>
     </>
   );
 }
-
-function UserName() {
-  const user = useSuspending<User>("/users/me");
-  return <>{user.name}</>;
-}
-
-function Posts() {
-  const { data: posts } = useSuspending<{ data: Post[] }>("/posts");
-  return (
-    <>
-      {posts.map((post) => (
-        <Post post={post} key={post.id} />
-      ))}
-    </>
-  );
-}
-
-function Post({ post }: { post: Post }) {
-  return (
-    <>
-      <StyledPost>
-        User Id: {post.userId}
-        <br />
-        Body: {post.body}
-        <br />
-        Post Id: {post.id}
-        <br />
-      </StyledPost>
-    </>
-  );
-}
-
-function DefaultUser() {
-  return <>world</>;
-}
-
-const HelloDiv = styled.div`
-  font-size: 32px;
-  font-family: "Lemon Milk";
-`;
-
-const StyledPost = styled.ul`
-  font-size: 2rem;
-  border: 1px solid #ccc;
-  padding: 2rem;
-  margin: 4em;
-  font-family: "Philosopher";
-`;
