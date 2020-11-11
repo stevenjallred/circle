@@ -1,15 +1,13 @@
 import React, { Suspense } from "react";
 import ReactDOM from "react-dom";
 import App from "./App";
-import { useApi } from "./hooks/use-api";
+import AppProvider from "./components/AppProvider";
 import reportWebVitals from "./reportWebVitals";
 
 ReactDOM.render(
-  <React.StrictMode>
-    <Suspense fallback={<div>Loading...</div>}>
-      <App />
-    </Suspense>
-  </React.StrictMode>,
+  <AppProvider>
+    <App />
+  </AppProvider>,
   document.getElementById("root")
 );
 

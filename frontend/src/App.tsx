@@ -1,5 +1,6 @@
+import { normalize } from "polished";
 import React, { Suspense, useState, useEffect } from "react";
-import styled from "styled-components/macro";
+import styled, { createGlobalStyle } from "styled-components/macro";
 import { useApi, axios, touch } from "./hooks/use-api";
 
 type User = {
@@ -28,7 +29,7 @@ export default function App() {
   useEffect(() => {
     const id = window.setInterval(() => {
       touch("/posts");
-    }, 1000);
+    }, 100000);
     return () => {
       clearInterval(id);
     };
