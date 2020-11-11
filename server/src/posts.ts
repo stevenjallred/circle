@@ -1,11 +1,11 @@
 //@ts-check
-const express = require("express");
-const { getUser } = require("./users");
-const { knex } = require("./knex");
+import express, { Request, Response } from "express";
+import { getUser } from "./users";
+import { knex } from "./knex";
 
-const postsRouter = express.Router();
+export const postsRouter = express.Router();
 
-postsRouter.get("/", async (req, res) => {
+postsRouter.get("/", async (req: Request, res: Response) => {
   const user = await getUser(req);
   const offset = Number(req.query.offset) || 0;
   const limit = Math.min(100, Math.max(1, Number(req.query.limit) || 10));
@@ -16,7 +16,7 @@ postsRouter.get("/", async (req, res) => {
   res.json({ meta, data: posts });
 });
 
-postsRouter.get("/:id", async (req, res) => {
+postsRouter.get("/:id", async (req: Request, res: Response) => {
   const user = await getUser(req);
   const id = Number(req.params.id);
   const post = await knex("posts").where({ id }).first();
@@ -27,7 +27,7 @@ postsRouter.get("/:id", async (req, res) => {
   }
 });
 
-postsRouter.post("/", async (req, res) => {
+postsRouter.post("/", async (req: Request, res: Response) => {
   const { body } = req.body;
 
   const user = await getUser(req);
@@ -38,7 +38,7 @@ postsRouter.post("/", async (req, res) => {
   res.json(post);
 });
 
-postsRouter.put("/:id", async (req, res) => {
+postsRouter.put("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const { body } = req.body;
 
@@ -55,7 +55,7 @@ postsRouter.put("/:id", async (req, res) => {
   res.json(updatedPost);
 });
 
-postsRouter.delete("/:id", async (req, res) => {
+postsRouter.delete("/:id", async (req: Request, res: Response) => {
   const { id } = req.params;
   const { body } = req.body;
 
@@ -68,5 +68,3 @@ postsRouter.delete("/:id", async (req, res) => {
 
   res.sendStatus(202);
 });
-
-module.exports = { postsRouter };

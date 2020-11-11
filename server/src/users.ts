@@ -1,9 +1,10 @@
-const { Router } = require("express");
-const { knex } = require("./knex");
-const usersRouter = Router();
+import { Router, Request, Response } from "express";
+import { knex } from "./knex";
+
+export const usersRouter = Router();
 
 const weakMapUsers = new WeakMap();
-async function getUser(req) {
+export async function getUser(req: Request) {
   if (!weakMapUsers.has(req)) {
     const user = await knex("users").first();
     weakMapUsers.set(req, user);
@@ -11,9 +12,7 @@ async function getUser(req) {
   }
   return weakMapUsers.get(req);
 }
-usersRouter.get("/me", async (req, res) => {
+usersRouter.get("/me", async (req: Request, res: Response) => {
   const user = await getUser(req);
   res.json(user);
 });
-
-module.exports = { getUser, usersRouter };
