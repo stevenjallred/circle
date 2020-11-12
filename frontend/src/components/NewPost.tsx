@@ -1,4 +1,9 @@
-import React, { useState } from "react";
+import React, {
+  TextareaHTMLAttributes,
+  useState,
+  useRef,
+  useLayoutEffect,
+} from "react";
 import styled from "styled-components/macro";
 import { useApi, touch } from "../hooks/use-api";
 import { Box } from "./Box";
@@ -20,21 +25,41 @@ export default function NewPost() {
     }
   }
 
+  const inputProps = {
+    value: text,
+    onChange: (e: React.ChangeEvent<HTMLTextAreaElement>) => {
+      setText(e.target.value);
+    },
+  };
+
   return (
-    <Box>
-      <form onSubmit={submit}>
-        <label>
-          Body:
-          <input
-            value={text}
-            onChange={(e) => {
-              setText(e.target.value);
-            }}
-          />
-        </label>
-        <button>Send</button>
-        {isLoading && <>Loading</>}
-      </form>
+    <Box as="form" onSubmit={submit}>
+      <label>
+        <SuperTextArea {...inputProps} />
+      </label>
+      <button>Send</button>
+      {isLoading && <>Loading</>}
     </Box>
   );
 }
+
+function SuperTextArea(props: TextareaHTMLAttributes<HTMLTextAreaElement>) {
+  const { value } = props;
+  const ref = useRef<HTMLTextAreaElement | null>(null);
+
+  useLayoutEffect(() => {
+    const textarea = ref.current;
+    if (textarea === null) return;
+
+    textarea.style.height = "";
+    textarea.style.height = `${textarea.scrollHeight}px`;
+  }, [value]);
+
+  return <SuperTextAreaStyles ref={ref} rows={1} {...props} />;
+}
+
+const SuperTextAreaStyles = styled.textarea`
+  width: 100%;
+  resize: none;
+  border: 0;
+`;

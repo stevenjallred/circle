@@ -15,6 +15,18 @@ export default function AppProvider({
   );
 }
 
+document.addEventListener(
+  "keydown",
+  (e: KeyboardEvent) => {
+    if (e.key === "Tab" && (e.target as HTMLElement).nodeName !== "INPUT") {
+      document.body.classList.add("accessibility");
+    } else if (e.key !== " " && e.key !== "Enter" && e.key !== "Escape") {
+      document.body.classList.remove("accessibility");
+    }
+  },
+  true
+);
+
 const GlobalStyles = createGlobalStyle`
   ${normalize()}
 
@@ -34,5 +46,11 @@ const GlobalStyles = createGlobalStyle`
 
   body {
     --window-height: 100vh;
+  }
+
+  body:not(.accessibility) {
+    *:focus {
+      outline: none;
+    }
   }
 `;
