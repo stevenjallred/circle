@@ -44,7 +44,7 @@ const User = styled.div`
 
 const Body = styled.div``;
 
-const Picture = styled.div`
+export const Picture = styled.div`
   border-radius: 1000px;
   width: 40px;
   height: 40px;
@@ -53,7 +53,7 @@ const Picture = styled.div`
   flex-grow: 0;
 `;
 
-const Content = styled.div`
+export const Content = styled.div`
   flex-grow: 1;
   flex-shrink: 1;
 `;
