@@ -5,9 +5,9 @@ import path from "path";
 import cookieParser from "cookie-parser";
 import logger from "morgan";
 import bodyParser from "body-parser";
-import { postsRouter } from "./posts";
-import { usersRouter } from "./users";
+import { objectsRouter } from "./objects";
 import cors from "cors";
+import { loginsRouter, validateAuth } from "./logins";
 
 const app = express();
 
@@ -18,8 +18,10 @@ app.use(express.urlencoded({ extended: false }));
 app.use(cookieParser());
 app.use(bodyParser.json());
 
-app.use("/posts", postsRouter);
-app.use("/users", usersRouter);
+app.use("/auth", loginsRouter);
+app.use(validateAuth);
+
+app.use("/objects", objectsRouter);
 
 // app.use(express.static(path.join(__dirname, 'public')));
 

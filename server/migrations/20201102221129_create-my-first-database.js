@@ -3,21 +3,28 @@
  */
 exports.up = async function (knex) {
   await knex.schema.createTable("users", (t) => {
-    t.bigIncrements("id").primary();
+    t.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     t.text("name").notNullable();
+    t.text("avatar_url");
+    t.timestamps(true, true);
   });
 
-  await knex.schema.createTable("posts", (t) => {
-    t.bigIncrements("id").primary();
+  await knex.schema.createTable("passwords", (t) => {
+    t.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
+    t.text("pw").notNullable();
+    t.uuid("user_id").notNullable().references("id").inTable("users").unique();
+    t.timestamps(true, true);
+  });
+
+  await knex.schema.createTable("objects", (t) => {
+    t.uuid("id").primary().defaultTo(knex.raw("gen_random_uuid()"));
     t.text("body").notNullable();
-    t.bigInteger("userId").notNullable().references("id").inTable("users");
+    t.uuid("user_id").notNullable().references("id").inTable("users");
+    t.timestamps(true, true);
   });
 };
 
 /**
  * @param {import('knex')} knex
  */
-exports.down = async function (knex) {
-  await knex.schema.dropTable("posts");
-  await knex.schema.dropTable("users");
-};
+exports.down = async function (knex) {};
